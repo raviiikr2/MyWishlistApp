@@ -13,20 +13,3 @@ data class Wish(
     @ColumnInfo(name = "wish-desc")
     val description : String= ""
 )
-
-object DummyWish{
-    val wishList = listOf(
-        Wish(
-            title = "Apple",
-            description = "Watch 6"
-        ),
-        Wish(
-            title = "Samsung",
-            description = "9 pro"
-        ),
-        Wish(
-            title = "Google",
-            description = "X series"
-        )
-    )
-}

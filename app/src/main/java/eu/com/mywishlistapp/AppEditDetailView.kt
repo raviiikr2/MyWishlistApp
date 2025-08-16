@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -24,8 +23,15 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.material3.*
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.launch
+
+import androidx.compose.material.Scaffold
+import androidx.compose.material.rememberScaffoldState
+import androidx.compose.runtime.collectAsState
 
 
 @Composable
@@ -35,7 +41,24 @@ fun AppEditDetailView(
     viewModel: WishViewModel,
     navController: NavHostController = rememberNavController()
 ){
+    val snackMessage = remember {
+        mutableStateOf("")
+    }
+
+    val scope = rememberCoroutineScope()
+    val scaffoldState = rememberScaffoldState()
+
+    if(id!=0L){
+        val wish = viewModel.getAWishesByID(id).collectAsState(initial = Wish(0,"",""))
+        viewModel.wishTitleState = wish.value.title
+        viewModel.wishDescriptionState = wish.value.description
+        }
+    else {
+        viewModel.wishTitleState = ""
+        viewModel.wishDescriptionState = ""
+    }
     Scaffold (
+        scaffoldState = scaffoldState,
         modifier = Modifier.padding(WindowInsets.statusBars.asPaddingValues()),
         topBar = {
             AppBarView(title =
@@ -57,7 +80,7 @@ fun AppEditDetailView(
             OutlinedTextField(
                 value = viewModel.wishTitleState,
                 onValueChange = { viewModel.onWishTitleChange(it) },
-                label = { Text("Title") },  // 👈 label as a composable
+                label = { Text("Title") },
                 modifier = Modifier.fillMaxWidth()
                     .padding(8.dp),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
@@ -83,9 +106,32 @@ fun AppEditDetailView(
             Button(
                 onClick = {
                     if(viewModel.wishTitleState.isNotEmpty() && viewModel.wishDescriptionState.isNotEmpty()){
-
+                        if(id != 0L){
+                            viewModel.updateAWish(
+                                Wish(
+                                    id = id,
+                                    title = viewModel.wishTitleState.trim(),
+                                    description = viewModel.wishDescriptionState.trim()
+                                )
+                            )
+                            navController.navigateUp()
+                        }
+                        else {
+                            // add a new wish
+                            viewModel.addWish(
+                                Wish(
+                                    title = viewModel.wishTitleState,
+                                    description = viewModel.wishDescriptionState.trim()
+                                ))
+                            snackMessage.value = "Wish Added"
+                            navController.navigateUp()
+                        }
                     }
                     else {
+                        snackMessage.value = "Enter field to Create a Wish"
+                    }
+                    scope.launch {
+                        scaffoldState.snackbarHostState.showSnackbar(snackMessage.value)
                         navController.navigateUp()
                     }
                 }) {

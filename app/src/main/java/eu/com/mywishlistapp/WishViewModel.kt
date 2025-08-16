@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 class WishViewModel(
-    private val wishRepository: WishRepository
+    private val wishRepository: WishRepository = Graph.wishRepository
 ) : ViewModel() {
     var wishTitleState by mutableStateOf("")
     var wishDescriptionState by mutableStateOf("")
@@ -44,10 +44,10 @@ class WishViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             wishRepository.deleteAWish(wish = wish)
         }
+    }
         fun updateAWish(wish: Wish) {
             viewModelScope.launch(Dispatchers.IO) {
                 wishRepository.updateAWish(wish = wish)
-            }
         }
     }
 }
