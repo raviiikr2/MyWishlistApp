@@ -1,6 +1,7 @@
 package eu.com.mywishlistapp
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -15,13 +16,28 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.DismissDirection
 import androidx.compose.material.DismissValue
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.SwipeToDismiss
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.rememberDismissState
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,10 +54,46 @@ fun HomeView(
     viewModel: WishViewModel
 ) {
     var wishToDelete by remember { mutableStateOf<Wish?>(null) }
+    var selectedWish by remember { mutableStateOf<Wish?>(null) }
+    var isEditMode by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
-            AppBarView(title = "Wishlist", onBackNavClicked = {})
+            AppBarView(
+                title = if (isEditMode) "Select Action" else "Wishlist",
+                onBackNavClicked = {
+                    // Exit edit mode when back is pressed
+                    isEditMode = false
+                    selectedWish = null
+                },
+                actions = {
+                    if (isEditMode && selectedWish != null) {
+                        // Edit button
+                        IconButton(onClick = {
+                            val id = selectedWish!!.id
+                            navController.navigate(Screen.AddScreen.route + "/$id")
+                            isEditMode = false
+                            selectedWish = null
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = "Edit"
+                            )
+                        }
+
+                        // Delete button
+                        IconButton(onClick = {
+                            wishToDelete = selectedWish
+                            isEditMode = false
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Delete"
+                            )
+                        }
+                    }
+                }
+            )
         },
         modifier = Modifier
             .fillMaxWidth()
@@ -65,17 +117,16 @@ fun HomeView(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(innerPadding)
-                .padding(top = 8.dp, bottom = 8.dp)
         ) {
-            items(wishList.value, key = { it.id }) { wish ->
+            items(wishList.value,
+                key = { it.id }) {
+                wish ->
                 val dismissState = rememberDismissState(
                     confirmStateChange = { dismissValue ->
                         if (dismissValue == DismissValue.DismissedToStart) {
                             wishToDelete = wish
-                            false // don’t auto-delete, wait for confirmation
-                        } else {
-                            false
-                        }
+                            false // Show dialog instead of auto delete
+                        } else false
                     }
                 )
 
@@ -92,15 +143,22 @@ fun HomeView(
                             Icon(
                                 imageVector = Icons.Default.Delete,
                                 contentDescription = "Delete",
-                                tint = Color.Black
+                                tint = MaterialTheme.colors.background
                             )
                         }
                     },
                     dismissContent = {
-                        WishItem(wish = wish) {
-                            val id = wish.id
-                            navController.navigate(Screen.AddScreen.route + "/$id")
-                        }
+                        WishItem(
+                            wish = wish,
+                            onClick = {
+                                val id = wish.id
+                                navController.navigate(Screen.AddScreen.route + "/$id")
+                            },
+                            onLongClick = {
+                                selectedWish = wish
+                                isEditMode = true
+                            }
+                        )
                     }
                 )
             }
@@ -130,13 +188,17 @@ fun HomeView(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun WishItem(wish: Wish, onClick: () -> Unit) {
+fun WishItem(wish: Wish, onClick: () -> Unit, onLongClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 8.dp, start = 8.dp, end = 8.dp)
-            .clickable { onClick() },
+            .padding(top = 2.dp, start = 1.dp, end = 1.dp)
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = onLongClick
+            ),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(
             containerColor = colorResource(id = R.color.App_bar_color)
@@ -150,3 +212,4 @@ fun WishItem(wish: Wish, onClick: () -> Unit) {
         }
     }
 }
+

@@ -1,7 +1,6 @@
 package eu.com.mywishlistapp
 
 import android.content.Context
-import androidx.room.Database
 import androidx.room.Room
 
 object Graph {
@@ -10,6 +9,7 @@ object Graph {
         WishRepository(wishDao = database.wishDao())
     }
     fun provide(context: Context) {
-        database = Room.databaseBuilder(context, WishDatabase::class.java, "wishlist.db").build()
+        database = Room.databaseBuilder(context, WishDatabase::class.java,
+            "wishlist.db").build()
     }
 }

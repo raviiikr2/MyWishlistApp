@@ -1,6 +1,5 @@
 package eu.com.mywishlistapp
 
-import android.R.attr.label
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -59,7 +58,7 @@ fun AppEditDetailView(
         modifier = Modifier
             .padding(WindowInsets.statusBars.asPaddingValues())
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background), // ✅ CHANGED
+            .background(MaterialTheme.colorScheme.background),
         topBar = {
             AppBarView(
                 title = if(id != 0L)
@@ -72,9 +71,9 @@ fun AppEditDetailView(
     ) { innerPadding ->
         Column(
             modifier = Modifier
-                .fillMaxHeight() // ✅ CHANGED (use full height)
+                .fillMaxHeight() // used full height
                 .padding(innerPadding)
-                .background(MaterialTheme.colorScheme.background), // ✅ CHANGED
+                .background(MaterialTheme.colorScheme.background),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
@@ -88,14 +87,14 @@ fun AppEditDetailView(
                     .fillMaxWidth()
                     .padding(8.dp),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                colors = OutlinedTextFieldDefaults.colors( // ✅ CHANGED
+                colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = MaterialTheme.colorScheme.primary,
                     unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                     cursorColor = MaterialTheme.colorScheme.primary,
                     focusedLabelColor = MaterialTheme.colorScheme.primary,
                     unfocusedLabelColor = MaterialTheme.colorScheme.onSurface,
-                    focusedContainerColor = MaterialTheme.colorScheme.background, // ✅ CHANGED
-                    unfocusedContainerColor = MaterialTheme.colorScheme.background // ✅ CHANGED
+                    focusedContainerColor = MaterialTheme.colorScheme.background,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.background
                 )
             )
             OutlinedTextField(
@@ -107,14 +106,14 @@ fun AppEditDetailView(
                     .padding(8.dp)
                     .height(200.dp),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                colors = OutlinedTextFieldDefaults.colors( // ✅ CHANGED
+                colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = MaterialTheme.colorScheme.primary,
                     unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                     cursorColor = MaterialTheme.colorScheme.primary,
                     focusedLabelColor = MaterialTheme.colorScheme.primary,
                     unfocusedLabelColor = MaterialTheme.colorScheme.onSurface,
-                    focusedContainerColor = MaterialTheme.colorScheme.background, // ✅ CHANGED
-                    unfocusedContainerColor = MaterialTheme.colorScheme.background // ✅ CHANGED
+                    focusedContainerColor = MaterialTheme.colorScheme.background,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.background
                 )
             )
 
@@ -178,14 +177,14 @@ fun AppEditDetailView(
 //            .padding(8.dp)
 //            .height(200.dp),
 //        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-//        colors = OutlinedTextFieldDefaults.colors( // ✅ CHANGED
+//        colors = OutlinedTextFieldDefaults.colors(
 //            focusedBorderColor = MaterialTheme.colorScheme.primary,
 //            unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
 //            cursorColor = MaterialTheme.colorScheme.primary,
 //            focusedLabelColor = MaterialTheme.colorScheme.primary,
 //            unfocusedLabelColor = MaterialTheme.colorScheme.onSurface,
-//            focusedContainerColor = MaterialTheme.colorScheme.background, // ✅ CHANGED
-//            unfocusedContainerColor = MaterialTheme.colorScheme.background // ✅ CHANGED
+//            focusedContainerColor = MaterialTheme.colorScheme.background,
+//            unfocusedContainerColor = MaterialTheme.colorScheme.background
 //        )
 //    )
 //}

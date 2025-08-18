@@ -19,7 +19,8 @@ import androidx.compose.ui.unit.dp
 fun AppBarView(
     title: String,
     modifier: Modifier = Modifier,
-    onBackNavClicked : () -> Unit){
+    onBackNavClicked : () -> Unit,
+    actions: @Composable () -> Unit = {} ){
     val navigationIcon: @Composable (() -> Unit)? =
         if (!title.contains("Wishlist")){
         {
@@ -41,7 +42,8 @@ fun AppBarView(
     },
         elevation = 32.dp,
         backgroundColor = colorResource(id = R.color.App_bar_color),
-        navigationIcon = navigationIcon
+        navigationIcon = navigationIcon,
+        actions = { actions() }
     )
 
 }
