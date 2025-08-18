@@ -146,7 +146,6 @@ fun AppEditDetailView(
                     }
                     scope.launch {
                         scaffoldState.snackbarHostState.showSnackbar(snackMessage.value)
-                        navController.navigateUp()
                     }
                 }
             ) {

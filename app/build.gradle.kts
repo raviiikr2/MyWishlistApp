@@ -1,3 +1,5 @@
+import org.gradle.kotlin.dsl.implementation
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -58,6 +60,18 @@ dependencies {
     implementation("androidx.compose.ui:ui:$compose_version")
     implementation("androidx.compose.material:material:$compose_version")
     implementation("androidx.compose.ui:ui-tooling-preview:$compose_version")
+
+
+    //for sharing
+    implementation("androidx.core:core-ktx:1.10.1")
+
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.32.0")
+
+
+        implementation ("androidx.compose.material3:material3:1.2.1")
+
+
+
 
 
     implementation("androidx.core:core-ktx:1.7.0")

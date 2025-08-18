@@ -1,6 +1,11 @@
 package eu.com.mywishlistapp
 
+import android.content.res.Resources
+import androidx.annotation.ColorRes
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,8 +16,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.DismissDirection
 import androidx.compose.material.DismissValue
 import androidx.compose.material.ExperimentalMaterialApi
@@ -22,6 +30,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.rememberDismissState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
@@ -33,6 +42,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,11 +51,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun HomeView(
@@ -57,15 +68,12 @@ fun HomeView(
     var selectedWish by remember { mutableStateOf<Wish?>(null) }
     var isEditMode by remember { mutableStateOf(false) }
 
+
     Scaffold(
         topBar = {
             AppBarView(
-                title = if (isEditMode) "Select Action" else "Wishlist",
-                onBackNavClicked = {
-                    // Exit edit mode when back is pressed
-                    isEditMode = false
-                    selectedWish = null
-                },
+                title = "Wishlist",
+                onBackNavClicked = {},
                 actions = {
                     if (isEditMode && selectedWish != null) {
                         // Edit button
@@ -81,20 +89,45 @@ fun HomeView(
                             )
                         }
 
-                        // Delete button
+                        // Delete Button
+                       Box (
+                           modifier = Modifier.wrapContentSize().background(
+                               color = Color(0xffbf73f5),
+                               shape = RoundedCornerShape(8.dp)
+                           )
+
+                       ){
+                            IconButton(onClick = {
+                                wishToDelete = selectedWish
+                                isEditMode = false
+                                selectedWish = null
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = "Delete"
+                                )
+                            }
+                        }
+
+                        // Share button
                         IconButton(onClick = {
-                            wishToDelete = selectedWish
+                            selectedWish?.let { wish ->
+                                ShareWishAsPdf(navController.context, wish)
+                            }
                             isEditMode = false
+                            selectedWish = null
                         }) {
                             Icon(
-                                imageVector = Icons.Default.Delete,
-                                contentDescription = "Delete"
+                                imageVector = Icons.Default.Share,
+                                contentDescription = "Share",
+                                tint = Color.Unspecified
                             )
                         }
                     }
                 }
             )
         },
+
         modifier = Modifier
             .fillMaxWidth()
             .padding(WindowInsets.statusBars.asPaddingValues()),
@@ -143,7 +176,7 @@ fun HomeView(
                             Icon(
                                 imageVector = Icons.Default.Delete,
                                 contentDescription = "Delete",
-                                tint = MaterialTheme.colors.background
+                                tint = colorResource(id = R.color.Delete_color)
                             )
                         }
                     },
@@ -175,12 +208,14 @@ fun HomeView(
                         viewModel.deleteAWish(wishToDelete!!)
                         wishToDelete = null
                     }) {
-                        Text("Yes")
+                        Text(text = "Yes",
+                            color = Color.Magenta)
                     }
                 },
                 dismissButton = {
                     TextButton(onClick = { wishToDelete = null }) {
-                        Text("No")
+                        Text(text = "No",
+                            color = Color.Magenta)
                     }
                 }
             )
@@ -194,7 +229,7 @@ fun WishItem(wish: Wish, onClick: () -> Unit, onLongClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 2.dp, start = 1.dp, end = 1.dp)
+            .padding(top = 2.dp)
             .combinedClickable(
                 onClick = onClick,
                 onLongClick = onLongClick
@@ -212,4 +247,3 @@ fun WishItem(wish: Wish, onClick: () -> Unit, onLongClick: () -> Unit) {
         }
     }
 }
-
