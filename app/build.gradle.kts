@@ -43,6 +43,7 @@ android {
 }
 
 dependencies {
+
 // Versions
     val nav_version = "2.9.0"
     val compose_version = "1.6.7"
@@ -61,14 +62,16 @@ dependencies {
     implementation("androidx.compose.material:material:$compose_version")
     implementation("androidx.compose.ui:ui-tooling-preview:$compose_version")
 
-
     //for sharing
     implementation("androidx.core:core-ktx:1.10.1")
 
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.32.0")
 
 
-        implementation ("androidx.compose.material3:material3:1.2.1")
+    implementation ("androidx.compose.material3:material3:1.2.1")
+        implementation("sh.calvin.reorderable:reorderable:3.0.0")
+
+
 
 
 

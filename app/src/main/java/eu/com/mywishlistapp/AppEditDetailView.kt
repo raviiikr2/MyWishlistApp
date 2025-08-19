@@ -56,7 +56,6 @@ fun AppEditDetailView(
     Scaffold (
         scaffoldState = scaffoldState,
         modifier = Modifier
-            .padding(WindowInsets.statusBars.asPaddingValues())
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
         topBar = {

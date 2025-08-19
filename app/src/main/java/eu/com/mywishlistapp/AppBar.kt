@@ -1,5 +1,6 @@
 package eu.com.mywishlistapp
 
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Icon
@@ -27,7 +28,8 @@ fun AppBarView(
                 IconButton(
                     onClick = {
                         onBackNavClicked()
-                    }
+                    },
+                    modifier = Modifier.padding(top = 20.dp)
                 ) {
                     Icon (imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         tint = Color.Black,
@@ -37,13 +39,15 @@ fun AppBarView(
             }
         }
         else null
-    TopAppBar(title = { Text(text = title, color = colorResource(id = R.color.white),
-        modifier = Modifier.padding(start = 4.dp).heightIn(max = 24.dp))
+    TopAppBar(title = { Text(text = title,
+        color = colorResource(id = R.color.white ),
+        modifier = Modifier.padding(start = 1.dp , top = 20.dp))
     },
         elevation = 32.dp,
         backgroundColor = colorResource(id = R.color.App_bar_color),
         navigationIcon = navigationIcon,
-        actions = { actions() }
+        actions = { actions() },
+        modifier = modifier.height(80.dp)
     )
 
 }

@@ -1,37 +1,11 @@
 package eu.com.mywishlistapp
 
-import android.content.res.Resources
-import androidx.annotation.ColorRes
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.DismissDirection
-import androidx.compose.material.DismissValue
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.SwipeToDismiss
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.rememberDismissState
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -42,22 +16,24 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
-@OptIn(ExperimentalMaterialApi::class)
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Share
+
 @Composable
 fun HomeView(
     paddingValues: PaddingValues,
@@ -68,7 +44,6 @@ fun HomeView(
     var selectedWish by remember { mutableStateOf<Wish?>(null) }
     var isEditMode by remember { mutableStateOf(false) }
 
-
     Scaffold(
         topBar = {
             AppBarView(
@@ -76,47 +51,28 @@ fun HomeView(
                 onBackNavClicked = {},
                 actions = {
                     if (isEditMode && selectedWish != null) {
-                        // Edit button
                         IconButton(onClick = {
                             val id = selectedWish!!.id
                             navController.navigate(Screen.AddScreen.route + "/$id")
                             isEditMode = false
                             selectedWish = null
-                        }) {
-                            Icon(
-                                imageVector = Icons.Default.Edit,
-                                contentDescription = "Edit"
-                            )
+                        }, modifier = Modifier.padding(top = 20.dp)) {
+                            Icon(imageVector = Icons.Default.Edit, contentDescription = "Edit")
                         }
-
-                        // Delete Button
-                       Box (
-                           modifier = Modifier.wrapContentSize().background(
-                               color = Color(0xffbf73f5),
-                               shape = RoundedCornerShape(8.dp)
-                           )
-
-                       ){
-                            IconButton(onClick = {
-                                wishToDelete = selectedWish
-                                isEditMode = false
-                                selectedWish = null
-                            }) {
-                                Icon(
-                                    imageVector = Icons.Default.Delete,
-                                    contentDescription = "Delete"
-                                )
-                            }
+                        IconButton(onClick = {
+                            wishToDelete = selectedWish
+                            isEditMode = false
+                            selectedWish = null
+                        }, modifier = Modifier.padding(top = 20.dp)) {
+                            Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete")
                         }
-
-                        // Share button
                         IconButton(onClick = {
                             selectedWish?.let { wish ->
                                 ShareWishAsPdf(navController.context, wish)
                             }
                             isEditMode = false
                             selectedWish = null
-                        }) {
+                        }, modifier = Modifier.padding(top = 20.dp)) {
                             Icon(
                                 imageVector = Icons.Default.Share,
                                 contentDescription = "Share",
@@ -127,71 +83,39 @@ fun HomeView(
                 }
             )
         },
-
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(WindowInsets.statusBars.asPaddingValues()),
         floatingActionButton = {
             FloatingActionButton(
-                onClick = {
-                    navController.navigate(Screen.AddScreen.route + "/0L")
-                },
-                modifier = Modifier.padding(all = 20.dp),
+                onClick = { navController.navigate(Screen.AddScreen.route + "/0L") },
+                modifier = Modifier.padding(20.dp),
                 containerColor = colorResource(id = R.color.App_bar_color),
                 contentColor = Color.White
-            ) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = null)
-            }
+            ) { Icon(imageVector = Icons.Default.Add, contentDescription = null) }
         }
     ) { innerPadding ->
         val wishList = viewModel.getAllWish.collectAsState(initial = listOf())
 
-        LazyColumn(
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(3),            //  three notes per row
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(innerPadding)
+                .fillMaxSize()
+                .padding(innerPadding),
+            contentPadding = PaddingValues(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(wishList.value,
-                key = { it.id }) {
-                wish ->
-                val dismissState = rememberDismissState(
-                    confirmStateChange = { dismissValue ->
-                        if (dismissValue == DismissValue.DismissedToStart) {
-                            wishToDelete = wish
-                            false // Show dialog instead of auto delete
-                        } else false
-                    }
-                )
-
-                SwipeToDismiss(
-                    state = dismissState,
-                    directions = setOf(DismissDirection.EndToStart),
-                    background = {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(end = 16.dp),
-                            contentAlignment = Alignment.CenterEnd
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Delete,
-                                contentDescription = "Delete",
-                                tint = colorResource(id = R.color.Delete_color)
-                            )
-                        }
+            items(
+                items = wishList.value,
+                key = { it.id }                      // stable key for smooth updates
+            ) { wish ->
+                WishItem(
+                    wish = wish,
+                    onClick = {
+                        val id = wish.id
+                        navController.navigate(Screen.AddScreen.route + "/$id")
                     },
-                    dismissContent = {
-                        WishItem(
-                            wish = wish,
-                            onClick = {
-                                val id = wish.id
-                                navController.navigate(Screen.AddScreen.route + "/$id")
-                            },
-                            onLongClick = {
-                                selectedWish = wish
-                                isEditMode = true
-                            }
-                        )
+                    onLongClick = {
+                        selectedWish = wish
+                        isEditMode = true
                     }
                 )
             }
@@ -207,15 +131,11 @@ fun HomeView(
                     TextButton(onClick = {
                         viewModel.deleteAWish(wishToDelete!!)
                         wishToDelete = null
-                    }) {
-                        Text(text = "Yes",
-                            color = Color.Magenta)
-                    }
+                    }) { Text("Yes", color = Color.Magenta) }
                 },
                 dismissButton = {
                     TextButton(onClick = { wishToDelete = null }) {
-                        Text(text = "No",
-                            color = Color.Magenta)
+                        Text("No", color = Color.Magenta)
                     }
                 }
             )
@@ -225,25 +145,44 @@ fun HomeView(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun WishItem(wish: Wish, onClick: () -> Unit, onLongClick: () -> Unit) {
+fun WishItem(
+    wish: Wish,
+    onClick: () -> Unit,
+    onLongClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val words = remember(wish.description) { wish.description.trim().split(Regex("\\s+")) }
+    val shortDescription = remember(words) {
+        val cut = words.take(5).joinToString(" ")
+        if (words.size > 10) "$cut…" else cut
+    }
+
     Card(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .padding(top = 2.dp)
-            .combinedClickable(
-                onClick = onClick,
-                onLongClick = onLongClick
-            ),
+            .height(110.dp)                          // ⬇ smaller tile height
+            .combinedClickable(onClick = onClick, onLongClick = onLongClick),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = colorResource(id = R.color.App_bar_color)
-        )
+        colors = CardDefaults.cardColors(containerColor = colorResource(id = R.color.App_bar_color))
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(10.dp),
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(text = wish.title, fontWeight = FontWeight.Bold, color = Color.White)
-            Text(text = wish.description, color = Color.White)
+            Text(
+                text = wish.title,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = shortDescription,
+                color = Color.White,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
         }
     }
 }
